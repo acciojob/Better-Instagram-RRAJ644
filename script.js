@@ -23,7 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     item.addEventListener('drop', () => {
       if (draggedItem) {
-        parent.insertBefore(draggedItem, item) // reorder the dragged item
+        // Swap the background images
+        let temp = item.style.backgroundImage
+        item.style.backgroundImage = draggedItem.style.backgroundImage
+        draggedItem.style.backgroundImage = temp
       }
     })
   })
