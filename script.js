@@ -1,47 +1,54 @@
+document.addEventListener('DOMContentLoaded', function () {
+  const items = document.querySelectorAll('.image');
+  const parent = document.getElementById('parent');
+  
+  let draggedItem = null;
 
-let dragindex = 0;
-let dropindex = 0;
-let clone = "";
+  items.forEach((item) => {
+    item.addEventListener('dragstart', (e) => {
+      draggedItem = item;
+      item.classList.add('selected');
+    });
 
-const images = document.querySelectorAll(".image");
+    item.addEventListener('dragend', () => {
+      setTimeout(() => {
+        draggedItem.classList.remove('selected');
+        draggedItem = null;
+      }, 0);
+    });
 
-function drag(e) {
-  e.dataTransfer.setData("text", e.target.id);
-}
+    item.addEventListener('dragover', (e) => {
+      e.preventDefault(); // Allow dropping
+    });
 
-function allowDrop(e) {
-  e.preventDefault();
-}
+    item.addEventListener('drop', (e) => {
+      e.preventDefault();
 
-function drop(e) {
-  clone = e.target.cloneNode(true);
-  let data = e.dataTransfer.getData("text");
-  let nodelist = document.getElementById("parent").childNodes;
-  console.log(data, e.target.id);
-  for (let i = 0; i < nodelist.length; i++) {
-    if (nodelist[i].id == data) {
-      dragindex = i;
+      // Only proceed if the dragged item is not the same as the target
+      if (draggedItem !== item) {
+        // Swap the content of the dragged and dropped items
+        const draggedItemContent = draggedItem.innerHTML;
+        const targetItemContent = item.innerHTML;
+
+        // Swap the content
+        draggedItem.innerHTML = targetItemContent;
+        item.innerHTML = draggedItemContent;
+
+        // Reorder the DOM as well
+        parent.insertBefore(draggedItem, item);
+      }
+    });
+  });
+
+  parent.addEventListener('dragover', (e) => {
+    e.preventDefault(); // Allow dropping in the parent container
+  });
+
+  parent.addEventListener('drop', (e) => {
+    e.preventDefault();
+    // Ensure that if the dragged item is dropped outside an image, it gets appended to the parent
+    if (draggedItem && !e.target.classList.contains('image')) {
+      parent.appendChild(draggedItem); // Drop it at the end of the parent container
     }
-  }
-
-  dragdrop(clone);
-
-  document
-    .getElementById("parent")
-    .replaceChild(document.getElementById(data), e.target);
-
-  document
-    .getElementById("parent")
-    .insertBefore(
-      clone,
-      document.getElementById("parent").childNodes[dragindex]
-    );
-}
-
-const dragdrop = (image) => {
-  image.ondragstart = drag;
-  image.ondragover = allowDrop;
-  image.ondrop = drop;
-};
-
-images.forEach(dragdrop);
+  });
+});
