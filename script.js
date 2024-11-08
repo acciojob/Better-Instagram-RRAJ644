@@ -1,6 +1,5 @@
-//your code here
 document.addEventListener('DOMContentLoaded', () => {
-  const items = document.querySelector('.image')
+  const items = document.querySelectorAll('.image') // select all image elements
   const parent = document.querySelector('#parent')
 
   let draggedItem = null
