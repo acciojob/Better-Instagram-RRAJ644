@@ -1,45 +1,57 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const items = document.querySelectorAll('.image')
-  const parent = document.getElementById('parent')
+// Get all draggable divs
+const draggableItems = document.querySelectorAll('.image');
 
-  let draggedItem = null
+// Loop through all items to add event listeners for drag and drop
+draggableItems.forEach(item => {
+  item.addEventListener('dragstart', dragStart);
+  item.addEventListener('dragover', dragOver);
+  item.addEventListener('dragenter', dragEnter);
+  item.addEventListener('dragleave', dragLeave);
+  item.addEventListener('drop', drop);
+  item.addEventListener('dragend', dragEnd);
+});
 
-  items.forEach((item) => {
-    item.addEventListener('dragstart', (e) => {
-      draggedItem = item
-      item.classList.add('selected')
-    })
+let draggedItem = null;  // To store the currently dragged item
 
-    item.addEventListener('dragend', () => {
-      setTimeout(() => {
-        draggedItem.classList.remove('selected')
-        draggedItem = null
-      }, 0)
-    })
+// On drag start, store the dragged element
+function dragStart(event) {
+  draggedItem = event.target;
+  event.dataTransfer.setData('text/html', draggedItem.innerHTML);
+}
 
-    item.addEventListener('dragover', (e) => {
-      e.preventDefault() // Allow dropping
-    })
+// On drag over, prevent default to allow dropping
+function dragOver(event) {
+  event.preventDefault();
+}
 
-    item.addEventListener('drop', (e) => {
-      e.preventDefault()
-      // Only proceed if the dragged item is not the same as the target
-      if (draggedItem !== item) {
-        // Insert the dragged item before the target (item) in the parent container
-        parent.insertBefore(draggedItem, item)
-      }
-    })
-  })
+// On drag enter, add a visual cue to indicate the target div
+function dragEnter(event) {
+  event.preventDefault();
+  event.target.style.border = "2px dashed #000"; // Adds a border when dragging over
+}
 
-  parent.addEventListener('dragover', (e) => {
-    e.preventDefault() // Allow dropping in the parent container
-  })
+// On drag leave, remove the visual cue
+function dragLeave(event) {
+  event.target.style.border = "";
+}
 
-  parent.addEventListener('drop', (e) => {
-    e.preventDefault()
-    // Ensure that if the dragged item is dropped outside an image, it gets appended to the parent
-    if (draggedItem && !e.target.classList.contains('image')) {
-      parent.appendChild(draggedItem) // Drop it at the end of the parent container
-    }
-  })
-})
+// On drop, swap the content of the dragged item and the target item
+function drop(event) {
+  event.preventDefault();
+  event.target.style.border = ""; // Remove the dashed border on drop
+  
+  // If the drop target is not the dragged item itself
+  if (draggedItem !== event.target) {
+    // Swap the content (background images)
+    const draggedContent = draggedItem.style.backgroundImage;
+    const targetContent = event.target.style.backgroundImage;
+    
+    draggedItem.style.backgroundImage = targetContent;
+    event.target.style.backgroundImage = draggedContent;
+  }
+}
+
+// On drag end, reset any visual feedback
+function dragEnd(event) {
+  draggedItem = null;
+}
