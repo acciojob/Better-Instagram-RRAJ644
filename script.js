@@ -1,45 +1,46 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const items = document.querySelectorAll('.image')
-  const parent = document.getElementById('parent')
+let dragindex = 0
+let dropindex = 0
+let clone = ''
 
-  let draggedItem = null
+const images = document.querySelectorAll('.image')
 
-  items.forEach((item) => {
-    item.addEventListener('dragstart', (e) => {
-      draggedItem = item
-      item.classList.add('selected')
-    })
+function drag(e) {
+  e.dataTransfer.setData('text', e.target.id)
+}
 
-    item.addEventListener('dragend', () => {
-      setTimeout(() => {
-        draggedItem.classList.remove('selected')
-        draggedItem = null
-      }, 0)
-    })
+function allowDrop(e) {
+  e.preventDefault()
+}
 
-    item.addEventListener('dragover', (e) => {
-      e.preventDefault() // Allow dropping
-    })
-
-    item.addEventListener('drop', (e) => {
-      e.preventDefault()
-      // Only proceed if the dragged item is not the same as the target
-      if (draggedItem !== item) {
-        // Insert the dragged item before the target (item) in the parent container
-        parent.insertBefore(draggedItem, item)
-      }
-    })
-  })
-
-  parent.addEventListener('dragover', (e) => {
-    e.preventDefault() // Allow dropping in the parent container
-  })
-
-  parent.addEventListener('drop', (e) => {
-    e.preventDefault()
-    // Ensure that if the dragged item is dropped outside an image, it gets appended to the parent
-    if (draggedItem && !e.target.classList.contains('image')) {
-      parent.appendChild(draggedItem) // Drop it at the end of the parent container
+function drop(e) {
+  clone = e.target.cloneNode(true)
+  let data = e.dataTransfer.getData('text')
+  let nodelist = document.getElementById('parent').childNodes
+  console.log(data, e.target.id)
+  for (let i = 0; i < nodelist.length; i++) {
+    if (nodelist[i].id == data) {
+      dragindex = i
     }
-  })
-})
+  }
+
+  dragdrop(clone)
+
+  document
+    .getElementById('parent')
+    .replaceChild(document.getElementById(data), e.target)
+
+  document
+    .getElementById('parent')
+    .insertBefore(
+      clone,
+      document.getElementById('parent').childNodes[dragindex]
+    )
+}
+
+const dragdrop = (image) => {
+  image.ondragstart = drag
+  image.ondragover = allowDrop
+  image.ondrop = drop
+}
+
+images.forEach(dragdrop)
