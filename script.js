@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const items = document.querySelectorAll('.image') // select all image elements
+  const items = document.querySelectorAll('.image')
   const parent = document.querySelector('#parent')
 
   let draggedItem = null
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     item.addEventListener('drop', () => {
       if (draggedItem) {
-        parent.insertBefore(draggedItem, item)
+        parent.insertBefore(draggedItem, item) // reorder the dragged item
       }
     })
   })
